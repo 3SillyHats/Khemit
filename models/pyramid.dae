@@ -4,8 +4,8 @@
         <contributor>
             <authoring_tool>SketchUp 13.0.4812</authoring_tool>
         </contributor>
-        <created>2013-09-21T04:09:54Z</created>
-        <modified>2013-09-21T04:09:54Z</modified>
+        <created>2013-09-21T05:59:02Z</created>
+        <modified>2013-09-21T05:59:02Z</modified>
         <unit meter="0.0254" name="inch" />
         <up_axis>Z_UP</up_axis>
     </asset>
@@ -679,7 +679,7 @@
                     </technique_common>
                 </source>
                 <source id="ID59">
-                    <float_array id="ID62" count="8">1.199908 60 -2.925092 61.2 -2.925092 60 1.199908 61.2</float_array>
+                    <float_array id="ID62" count="8">0.5999539 30 -1.462546 30.6 -1.462546 30 0.5999539 30.6</float_array>
                     <technique_common>
                         <accessor count="4" source="#ID62" stride="2">
                             <param name="S" type="float" />
@@ -1227,7 +1227,7 @@
                     </technique_common>
                 </source>
                 <source id="ID173">
-                    <float_array id="ID176" count="24">-5.555556 0 -11.11111 16.66667 -11.11111 -5.555556 -5.555556 11.11111 11.11111 -5.555556 -0.1625051 0 0 0 0.1624949 0 5.555556 0 11.11111 16.66667 0 11.11111 5.555556 11.11111</float_array>
+                    <float_array id="ID176" count="24">-33.33333 0 -66.66667 100 -66.66667 -33.33333 -33.33333 66.66667 66.66667 -33.33333 -0.9750307 0 0 0 0.9749693 0 33.33333 0 66.66667 100 0 66.66667 33.33333 66.66667</float_array>
                     <technique_common>
                         <accessor count="12" source="#ID176" stride="2">
                             <param name="S" type="float" />
@@ -1269,7 +1269,7 @@
                     </technique_common>
                 </source>
                 <source id="ID181">
-                    <float_array id="ID184" count="8">-0.5385174 46.42392 0.4226882 100.2757 -0.5773115 100.275 0.4612979 46.42487</float_array>
+                    <float_array id="ID184" count="8">-0.2692587 23.21196 0.2113441 50.13786 -0.2886558 50.1375 0.230649 23.21244</float_array>
                     <technique_common>
                         <accessor count="4" source="#ID184" stride="2">
                             <param name="S" type="float" />
@@ -1343,7 +1343,7 @@
                     </technique_common>
                 </source>
                 <source id="ID195">
-                    <float_array id="ID198" count="50">-2.925092 3.29938e-009 -2.925092 50 -2.925092 47 -2.416586 50 2.924908 50 -2.400092 50 -1.200092 50 -1.000092 50 0.9999079 50 1.199908 50 2.399908 50 1.216985 -46.42387 2.420363 -57.19382 2.416985 -46.42337 1.220363 -57.1942 0 0 2.924908 50 -2.925092 6.408384e-011 2.924908 -6.40798e-011 2.924908 47 2.399908 50 1.199908 60 1.199908 50 1.199908 61.2 2.399908 61.2</float_array>
+                    <float_array id="ID198" count="50">-1.462546 1.64969e-009 -1.462546 25 -1.462546 23.5 -1.208293 25 1.462454 25 -1.200046 25 -0.6000461 25 -0.5000461 25 0.4999539 25 0.5999539 25 1.199954 25 0.6084924 -23.21193 1.210182 -28.59691 1.208492 -23.21168 0.6101817 -28.5971 0 0 1.462454 25 -1.462546 3.204192e-011 1.462454 -3.20399e-011 1.462454 23.5 1.199954 25 0.5999539 30 0.5999539 25 0.5999539 30.6 1.199954 30.6</float_array>
                     <technique_common>
                         <accessor count="25" source="#ID198" stride="2">
                             <param name="S" type="float" />
@@ -2377,6 +2377,9 @@
                         <diffuse>
                             <texture texture="ID20" texcoord="UVSET0" />
                         </diffuse>
+                        <transparent opaque="A_ONE">
+                            <texture texture="ID20" texcoord="UVSET0" />
+                        </transparent>
                     </lambert>
                 </technique>
             </profile_COMMON>
@@ -2489,7 +2492,7 @@
             <init_from>pyramid/material_2.jpg</init_from>
         </image>
         <image id="ID18">
-            <init_from>pyramid/material_1.jpg</init_from>
+            <init_from>pyramid/material_1.png</init_from>
         </image>
         <image id="ID53">
             <init_from>pyramid/floor.png</init_from>
