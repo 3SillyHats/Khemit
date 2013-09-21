@@ -83,9 +83,9 @@ class Model(object):
     def my_aux_loader(filename):
         print filename
         return None
-        
+
     def __init__(self, filename):
-        dae = Collada(filename)
+        dae = Collada(filename, aux_file_loader = my_aux_loader)
         self.parts = []
         
         for geometry in dae.geometries:
