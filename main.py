@@ -4,7 +4,7 @@ import pygame
 from pygame.locals import *
 
 from render import Model, FragmentShader, VertexShader, Program
-from transformations import projection_matrix, translation_matrix, rotation_matrix, identity_matrix
+from transformations import clip_matrix, translation_matrix, rotation_matrix, identity_matrix
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
@@ -41,48 +41,31 @@ while True:
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    glDisable(GL_DEPTH_TEST)
+    glCullFace(GL_FRONT) #?!
+    glEnable(GL_DEPTH_TEST)
 
     shader.use()
 
-    #fov = 90
-    #point = [0, 0, 0]
-    #normal = [0, 0, 1]
-    #perspective_point = [0, 0, -1/math.tan(fov/2)]
-    #proj_matrix = projection_matrix(point, normal, perspective=perspective_point)
-    #proj_matrix = identity_matrix() #.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-    #proj_matrix.astype(numpy.float32)
-    #proj_matrix_p = proj_matrix.ctypes.data_as(c_float_p)
-    #for i in proj_matrix_p:
-        #print(i)
-    #proj_loc = glGetUniformLocation(shader.id, "projection_matrix")
-    #glUniformMatrix4fv(proj_loc, 1, False, proj_matrix_p)
+    fov = 65.0
+    aspect = 800.0/600.0
+    near = 1.0
+    far = 10000.0
+    right = near * math.tan(fov*math.pi/360.0)
+    left = -right
+    top = right / aspect
+    bottom = -top
+    proj_matrix = clip_matrix(left, right, bottom, top, near, far, perspective=True)
+    proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
+    glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    #mv_matrix = translation_matrix([0, 0, -5000])
-    #mv_matrix *= rotation_matrix(-80, [1, 0, 0])
-    #mv_matrix = identity_matrix() #.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-    #mv_matrix.astype(numpy.float32)
-    #mv_matrix_p = proj_matrix.ctypes.data_as(c_float_p)
-    #mv_loc = glGetUniformLocation(shader.id, "modelview_matrix")
-    #glUniformMatrix4fv(mv_loc, 1, False, mv_matrix_p)
+    mv_matrix = translation_matrix([0.0, 0.0, 150.0]).dot(rotation_matrix(130.0*math.pi/180.0, [1.0, 0.0, 0.0]))
+    mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
+    glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
     #glEnable(GL_LIGHTING)
     #glEnable(GL_LIGHT0)
-    #light_pos = numpy.array([0, 1000, 0]).ctypes.data_as(POINTER(c_float))
-    #glLightfv(GL_LIGHT0, GL_POSITION, light_pos)
-    #light_diffuse = numpy.array([1, 1, 1, 1.0]).ctypes.data_as(POINTER(c_float))
-    #glMaterialfv(GL_FRONT, GL_DIFFUSE, light_diffuse);
-
-
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(65, 800/600, 1, 10000)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    glTranslatef(0, 0, -100)
-    glRotatef(-80, 1, 0, 0)
+    #glLightfv(GL_LIGHT0, GL_POSITION, [0,100, 100])
+    #glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1.0]);
 
     for renderable in model.renderables():
         renderable.draw()

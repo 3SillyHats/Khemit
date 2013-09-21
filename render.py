@@ -62,11 +62,11 @@ class Mesh(object):
         self.count = len(flatten(indices))
     
     def draw(self):
+        self.vertices.bind()
+        self.indices.bind()
         try:
             glEnableClientState(GL_VERTEX_ARRAY)
-            self.vertices.bind()
             glVertexPointerf( self.vertices )
-            self.indices.bind()
             glDrawElements(
                 GL_TRIANGLES, self.count,
                 GL_UNSIGNED_SHORT, self.indices
@@ -80,12 +80,8 @@ class ModelPart(object):
             self.mesh = mesh
 
 class Model(object):
-    def my_aux_loader(filename):
-        print filename
-        return None
-
     def __init__(self, filename):
-        dae = Collada(filename, aux_file_loader = my_aux_loader)
+        dae = Collada(filename)
         self.parts = []
         
         for geometry in dae.geometries:

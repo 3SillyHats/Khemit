@@ -1,11 +1,11 @@
-#version 120
+#version 330
 
-//varying vec3 N;
-//varying vec3 v;
+uniform mat4 projection_matrix;
+uniform mat4 modelview_matrix;
 
-void main(void)
+layout(location = 0) in vec3 position;
+
+void main()
 {
-   //v = vec3(gl_ModelViewMatrix * gl_Vertex);       
-   //N = normalize(gl_NormalMatrix * gl_Normal);
-   gl_Position = gl_ModelViewProjectionMatrix * gl_Vertex;
+   gl_Position = projection_matrix * modelview_matrix * vec4(position, 1.0);
 }
