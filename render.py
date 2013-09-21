@@ -76,20 +76,43 @@ class Mesh(object):
             self.indices.unbind()
 
 class ModelPart(object):
-        def __init__(self, mesh):
-            self.mesh = mesh
+    def __init__(self, mesh, im):
+        self.mesh = mesh
+        # try:
+        #     ix, iy, image = im.size[0], im.size[1], im.tostring("raw", "RGBA", 0, -1)
+        # except SystemError:
+        #     ix, iy, image = im.size[0], im.size[1], im.tostring("raw", "RGBX", 0, -1)
+        # self.texID = glGenTextures(1)
+        # glBindTexture(GL_TEXTURE_2D, self.texID)
+        # glPixelStorei(GL_UNPACK_ALIGNMENT,1)
+        # glTexImage2D(
+        #     GL_TEXTURE_2D, 0, 3, ix, iy, 0,
+        #     GL_RGBA, GL_UNSIGNED_BYTE, image
+        # )
+    
+    def draw(self):
+        # glEnable(GL_TEXTURE_2D)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
+        # glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        # glTexEnvf(GL_TEXTURE_ENV, GL_TEXTURE_ENV_MODE, GL_DECAL)
+        # glBindTexture(GL_TEXTURE_2D, self.texID)
+        self.mesh.draw()
 
 class Model(object):
     def __init__(self, filename):
         dae = Collada(filename)
         self.parts = []
         
-        for geometry in dae.geometries:
-            triset = geometry.primitives[0]
-            mesh = Mesh(triset.vertex_index, triset.vertex)
-            part = ModelPart(mesh)
-            self.parts.append(part)
+        for geometry in dae.scene.objects('geometry'):
+            for triset in geometry.primitives():
+                mesh = Mesh(triset.vertex_index, triset.vertex)
+                effect = triset.material.effect
+                texture = None
+                if len(effect.params) > 0:
+                    texture = effect.params[0].image.pilimage
+                part = ModelPart(mesh, texture)
+                self.parts.append(part)
     
     def renderables(self):
         for part in self.parts:
-            yield part.mesh
+            yield part
