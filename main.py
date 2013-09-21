@@ -67,7 +67,7 @@ while True:
     proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
     glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    mv_matrix = translation_matrix([0.0, 0.0, 150.0]).dot(rotation_matrix(y_facing*math.pi/180.0, [1.0, 0.0, 0.0]).dot(rotation_matrix(x_facing*math.pi/180.0, [0.0, 1.0, 0.0])))
+    mv_matrix = rotation_matrix(y_facing*math.pi/180.0, [1.0, 0.0, 0.0]).dot(rotation_matrix(x_facing*math.pi/180.0, [0.0, 1.0, 0.0])).dot(translation_matrix([0.0, 0.0, 150.0]))
     mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
     glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
