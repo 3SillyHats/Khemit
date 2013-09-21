@@ -33,7 +33,7 @@ vbo = OpenGL.arrays.vbo.VBO(
 )
 
 x_facing = 0.
-y_facing = 130.
+y_facing = 0.
 
 clock = pygame.time.Clock()
 while True:
@@ -43,9 +43,9 @@ while True:
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             exit()
 
-    delta_y, delta_x = pygame.mouse.get_rel()
+    delta_x, delta_y = pygame.mouse.get_rel()
     x_facing = (x_facing + delta_x)%360
-    y_facing = (y_facing + delta_y)%360
+    y_facing = min(max(y_facing + delta_y,-90),90)
     
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -67,7 +67,7 @@ while True:
     proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
     glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    mv_matrix = rotation_matrix(y_facing*math.pi/180.0, [1.0, 0.0, 0.0]).dot(rotation_matrix(x_facing*math.pi/180.0, [0.0, 1.0, 0.0])).dot(translation_matrix([0.0, 0.0, 150.0]))
+    mv_matrix = rotation_matrix((90 + y_facing)*math.pi/180.0, [1.0, 0.0, 0.0]).dot(rotation_matrix(x_facing*math.pi/180.0, [0.0, 0.0, 1.0]).dot(translation_matrix([-50.0, 0.0, -10.0])))
     mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
     glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
