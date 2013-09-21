@@ -1,6 +1,7 @@
 import math
 import numpy
 import pygame
+import camera
 from pygame.locals import *
 
 from render import Model, FragmentShader, VertexShader, Program
@@ -34,14 +35,7 @@ vbo = OpenGL.arrays.vbo.VBO(
 
 TURN_SPEED = 1.5
 MOVE_SPEED = 0.1
-x_facing = 0.
-y_facing = 0.
-x_norm = 1.
-y_norm = 0.
-
-x_pos = 50.
-y_pos = 0.
-z_pos = 2.
+camera = Camera(50,0,2, 0,0,0)
 
 clock = pygame.time.Clock()
 while True:
@@ -53,26 +47,25 @@ while True:
 
     delta_x, delta_y = pygame.mouse.get_rel()
 
-    if(delta_y != 0):
-        y_facing = min(max(y_facing + TURN_SPEED*delta_y,-math.pi/2),math.pi/2)
-    if(delta_x != 0):
-        x_facing = (x_facing + TURN_SPEED*delta_x)%(2*math.pi)
-        facing_norm[0], facing_norm[1] = math.cos(x_facing), math.sin(x_facing)
-    
+    camera.rotate(delta_x*TURN_SPEED, delta_y*TURN_SPEED)
+
     keyDown = pygame.key.get_pressed()
+    norm = camera.getNorm()
 
     if keyDown[pygame.K_w]:
-        x_pos += MOVE_SPEED * x_norm;
-        y_pos += MOVE_SPEED * y_norm;
+        dx += MOVE_SPEED * norm[0];
+        dy += MOVE_SPEED * norm[1];
     if keyDown[pygame.K_s]:
-        x_pos -= MOVE_SPEED * x_norm;
-        y_pos -= MOVE_SPEED * y_norm;
+        dx -= MOVE_SPEED * norm[0];
+        dy -= MOVE_SPEED * norm[1];
     if keyDown[pygame.K_a]:
-        x_pos += MOVE_SPEED * y_norm;
-        y_pos -= MOVE_SPEED * x_norm;
+        dx += MOVE_SPEED * norm[1];
+        dy -= MOVE_SPEED * norm[0];
     if keyDown[pygame.K_d]:
-        x_pos -= MOVE_SPEED * y_norm;
-        y_pos += MOVE_SPEED * x_norm;
+        dx -= MOVE_SPEED * norm[1];
+        dy += MOVE_SPEED * norm[0];
+
+    camera.move(dx,dy)
 
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -94,7 +87,7 @@ while True:
     proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
     glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    mv_matrix = rotation_matrix(90 + y_facing, [1.0, 0.0, 0.0]).dot(rotation_matrix(-x_facing, [0.0, 0.0, 1.0]).dot(translation_matrix([-x_pos, -y_pos, -z_pos])))
+    mv_matrix = camera.getMatrix()
     mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
     glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
