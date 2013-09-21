@@ -80,6 +80,10 @@ class ModelPart(object):
             self.mesh = mesh
 
 class Model(object):
+    def my_aux_loader(filename):
+        print filename
+        return None
+        
     def __init__(self, filename):
         dae = Collada(filename)
         self.parts = []
