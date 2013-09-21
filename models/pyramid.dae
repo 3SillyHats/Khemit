@@ -4,8 +4,8 @@
         <contributor>
             <authoring_tool>SketchUp 13.0.4812</authoring_tool>
         </contributor>
-        <created>2013-09-21T05:59:02Z</created>
-        <modified>2013-09-21T05:59:02Z</modified>
+        <created>2013-09-21T09:30:02Z</created>
+        <modified>2013-09-21T09:30:02Z</modified>
         <unit meter="0.0254" name="inch" />
         <up_axis>Z_UP</up_axis>
     </asset>
@@ -2313,25 +2313,25 @@
         </geometry>
     </library_geometries>
     <library_materials>
-        <material id="ID3" name="material_2">
+        <material id="ID3" name="Roof">
             <instance_effect url="#ID4" />
         </material>
-        <material id="ID16" name="material_1">
+        <material id="ID16" name="Walls">
             <instance_effect url="#ID17" />
         </material>
         <material id="ID38" name="material">
             <instance_effect url="#ID37" />
         </material>
-        <material id="ID51" name="floor">
+        <material id="ID51" name="Floor">
             <instance_effect url="#ID52" />
         </material>
-        <material id="ID152" name="Stone_Brushed_Khaki">
+        <material id="ID152" name="Pyramid">
             <instance_effect url="#ID153" />
         </material>
-        <material id="ID165" name="Groundcover_Sand_Smooth">
+        <material id="ID165" name="Outside">
             <instance_effect url="#ID166" />
         </material>
-        <material id="ID354" name="material_3">
+        <material id="ID354" name="Unfinished">
             <instance_effect url="#ID355" />
         </material>
         <material id="ID362" name="edge_color000255">
@@ -2489,19 +2489,19 @@
     </library_effects>
     <library_images>
         <image id="ID5">
-            <init_from>pyramid/material_2.jpg</init_from>
+            <init_from>pyramid/Roof.jpg</init_from>
         </image>
         <image id="ID18">
-            <init_from>pyramid/material_1.png</init_from>
+            <init_from>pyramid/Walls.png</init_from>
         </image>
         <image id="ID53">
-            <init_from>pyramid/floor.png</init_from>
+            <init_from>pyramid/Floor.png</init_from>
         </image>
         <image id="ID154">
-            <init_from>pyramid/Stone_Brushed_Khaki.jpg</init_from>
+            <init_from>pyramid/Pyramid.jpg</init_from>
         </image>
         <image id="ID167">
-            <init_from>pyramid/Groundcover_Sand_Smooth.jpg</init_from>
+            <init_from>pyramid/Outside.jpg</init_from>
         </image>
     </library_images>
     <scene>
