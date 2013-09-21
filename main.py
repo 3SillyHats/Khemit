@@ -32,8 +32,16 @@ vbo = OpenGL.arrays.vbo.VBO(
     ],'f')
 )
 
+TURN_SPEED = 1.5
+MOVE_SPEED = 0.1
 x_facing = 0.
 y_facing = 0.
+x_norm = 1.
+y_norm = 0.
+
+x_pos = 50.
+y_pos = 0.
+z_pos = 2.
 
 clock = pygame.time.Clock()
 while True:
@@ -44,9 +52,28 @@ while True:
             exit()
 
     delta_x, delta_y = pygame.mouse.get_rel()
-    x_facing = (x_facing + delta_x)%360
-    y_facing = min(max(y_facing + delta_y,-90),90)
+
+    if(delta_y != 0):
+        y_facing = min(max(y_facing + TURN_SPEED*delta_y,-math.pi/2),math.pi/2)
+    if(delta_x != 0):
+        x_facing = (x_facing + TURN_SPEED*delta_x)%(2*math.pi)
+        facing_norm[0], facing_norm[1] = math.cos(x_facing), math.sin(x_facing)
     
+    keyDown = pygame.key.get_pressed()
+
+    if keyDown[pygame.K_w]:
+        x_pos += MOVE_SPEED * x_norm;
+        y_pos += MOVE_SPEED * y_norm;
+    if keyDown[pygame.K_s]:
+        x_pos -= MOVE_SPEED * x_norm;
+        y_pos -= MOVE_SPEED * y_norm;
+    if keyDown[pygame.K_a]:
+        x_pos += MOVE_SPEED * y_norm;
+        y_pos -= MOVE_SPEED * x_norm;
+    if keyDown[pygame.K_d]:
+        x_pos -= MOVE_SPEED * y_norm;
+        y_pos += MOVE_SPEED * x_norm;
+
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_CULL_FACE)
@@ -67,7 +94,7 @@ while True:
     proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
     glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    mv_matrix = rotation_matrix((90 + y_facing)*math.pi/180.0, [1.0, 0.0, 0.0]).dot(rotation_matrix(x_facing*math.pi/180.0, [0.0, 0.0, 1.0]).dot(translation_matrix([-50.0, 0.0, -10.0])))
+    mv_matrix = rotation_matrix(90 + y_facing, [1.0, 0.0, 0.0]).dot(rotation_matrix(-x_facing, [0.0, 0.0, 1.0]).dot(translation_matrix([-x_pos, -y_pos, -z_pos])))
     mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
     glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
