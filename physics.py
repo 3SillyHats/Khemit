@@ -7,17 +7,12 @@ class Triangle(object):
         if linalg.norm(self.norm) > 0:
             self.norm = self.norm / linalg.norm(self.norm)
 
-        ac = vertices[2] - vertices[0]
-        ab = vertices[1] - vertices[0]
-        abXac = cross( ab, ac )
-
-        if linalg.norm(abXac) > 0:
-            toCircumsphereCenter = (cross( abXac, ab )*ac.dot(ac) + cross( ac, abXac )*ab.dot(ab)) / (2.0*abXac.dot(abXac))
-            self.radius = linalg.norm(toCircumsphereCenter)        
-            self.centre = vertices[0] + toCircumsphereCenter
-        else:
-            self.radius = 0
-            self.centre = array([0,0,0], 'f')
+        self.centre = average(vertices, axis=0)
+        self.radius = max(
+            linalg.norm(vertices[0] - self.centre),
+            linalg.norm(vertices[1] - self.centre),
+            linalg.norm(vertices[2] - self.centre),
+        )
 
     def collideSphere(self, position, radius):
         #test if spheres intersect
@@ -35,8 +30,6 @@ class Triangle(object):
             #plane does not intersect
             return None
 
-
-
     	proj = empty([3,2])
 
     	v     = (position - self.vertices[0])
@@ -46,7 +39,7 @@ class Triangle(object):
     	if i_len == 0:
             v = -plane_distance*self.norm
             v_norm = linalg.norm(v)
-    	else:
+	else:
             i     = i_vec / i_len
             j     = cross(i,self.norm)
 
@@ -72,7 +65,6 @@ class Triangle(object):
     	return p
 
     def checkCollision2d(self,tri,r2):
-        print tri
         #test if origin is inside triangle
         
         #A *[t,s] = v   => [t,s] = A^-1 v
@@ -105,7 +97,6 @@ class Triangle(object):
                     return tri[end]
 
             elif closest_dist**2 < r2:
-                print ratio
                 #edge intersects circle
                 return closest_dist*edge_norm
 
@@ -122,7 +113,6 @@ def collide(x, r, triangles):
     for t in triangles:
         pen = t.collideSphere(x, r)
         if pen is not None:
-            print(pen)
             pen_depth = linalg.norm(pen)
             if pen_depth > 0:
                 penetrations.append([pen_depth, pen/pen_depth])

@@ -20,14 +20,14 @@ class Model(object):
                     mesh = render.Mesh(triset.vertex_index, triset.vertex, triset.texcoord_indexset[0], triset.texcoordset[0], triset.normal_index, triset.normal)
                     effect = triset.material.effect
                     texture = None
-                    if len(effect.params) > 0:
+                    if len(effect.params) > 0 and mesh.count%3 == 0 and mesh.count > 0:
                         texture = effect.params[0].image.pilimage
-                    part = render.ModelPart(mesh, texture)
-                    self.parts.append(part)
+                        part = render.ModelPart(mesh, texture)
+                        self.parts.append(part)
 
-                    for triangle in triset.vertex_index:
-                        tri = physics.Triangle(triset.vertex[triangle])
-                        self.triangles.append(tri)
+                        for triangle in triset.vertex_index:
+                            tri = physics.Triangle(triset.vertex[triangle])
+                            self.triangles.append(tri)
     
     def renderables(self):
         for part in self.parts:

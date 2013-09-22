@@ -38,7 +38,7 @@ vbo = OpenGL.arrays.vbo.VBO(
 
 TURN_SPEED = 0.01
 MOVE_SPEED = 0.1
-camera = camera.Camera(0,-10,2, 0,0,0)
+camera = camera.Camera(0,-10,1.0, 0,0,0)
 
 shader.use()
 li_loc = glGetUniformLocation(shader.program, "light_intensity")
@@ -47,6 +47,8 @@ ai_loc = glGetUniformLocation(shader.program, "ambient_intensity")
 glUniform4f(ai_loc, 0.2, 0.2, 0.2, 1.0)
 
 light_direction = numpy.array([math.sqrt(1.0/6.0), -math.sqrt(2.0/6.0), math.sqrt(3.0/6.0), 0], 'f')
+
+vz = 0
 
 for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -57,6 +59,8 @@ delta_x, delta_y = pygame.mouse.get_rel()
 
 clock = pygame.time.Clock()
 while True:
+    dt = clock.tick(60) / 1000.0
+
     for event in pygame.event.get():
         if event.type == pygame.QUIT:
             exit()
@@ -116,10 +120,13 @@ while True:
     #glLightfv(GL_LIGHT0, GL_POSITION, [0,100, 100])
     #glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1.0]);
 
-    (dx, dy, dz) = physics.collide(camera.pos, 0.5, model.collideables())
-    delta = numpy.array([dx, dy, dz, 0], 'f')
-    delta_camera_space = mv_matrix.dot(delta)
-    camera.move(delta[0], delta[1], delta[2])
+    vz -= 9.8*dt
+    camera.move(0, 0, vz*dt)
+
+    (dx, dy, dz) = physics.collide(camera.pos, 1.0, model.collideables())
+    if dz > 0:
+            vz = 0
+    camera.move(dx, dy, dz)
 
     light_dir_camera_space = mv_matrix.dot(light_direction)
     ld_loc = glGetUniformLocation(shader.program, "dir_to_light")
@@ -129,5 +136,3 @@ while True:
         renderable.draw(shader)
     
     pygame.display.flip()
-    
-    clock.tick(60)
