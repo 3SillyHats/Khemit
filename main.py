@@ -4,7 +4,10 @@ import pygame
 import camera
 from pygame.locals import *
 
-from render import Model, FragmentShader, VertexShader, Program
+from model import Model
+from render import FragmentShader, VertexShader, Program
+import physics
+
 from transformations import clip_matrix, translation_matrix, rotation_matrix, identity_matrix
 from OpenGL.GL import *
 from OpenGL.GLU import *
@@ -33,8 +36,8 @@ vbo = OpenGL.arrays.vbo.VBO(
     ],'f')
 )
 
-TURN_SPEED = 0.02
-MOVE_SPEED = 1.0
+TURN_SPEED = 0.01
+MOVE_SPEED = 0.1
 camera = camera.Camera(0,-10,2, 0,0,0)
 
 shader.use()
@@ -83,7 +86,7 @@ while True:
         dy += MOVE_SPEED * norm[0];
 
     camera.move(dx,dy)
-
+    
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_CULL_FACE)
@@ -94,9 +97,9 @@ while True:
 
     fov = 90.0
     aspect = 800.0/600.0
-    near = 1.0
+    near = 4.0
     far = 10000.0
-    right = near * math.tan(fov*math.pi/720.0)
+    right = math.tan(fov*math.pi/720.0)
     left = -right
     top = right / aspect
     bottom = -top
@@ -113,6 +116,11 @@ while True:
     #glLightfv(GL_LIGHT0, GL_POSITION, [0,100, 100])
     #glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1.0]);
 
+    (dx, dy, dz) = physics.collide(camera.pos, 0.5, model.collideables())
+    delta = numpy.array([dx, dy, dz, 0], 'f')
+    delta_camera_space = mv_matrix.dot(delta)
+    camera.move(delta[0], delta[1], delta[2])
+
     light_dir_camera_space = mv_matrix.dot(light_direction)
     ld_loc = glGetUniformLocation(shader.program, "dir_to_light")
     glUniform3fv(ld_loc, 1, numpy.array(light_dir_camera_space[:3]))
@@ -122,4 +130,4 @@ while True:
     
     pygame.display.flip()
     
-    clock.tick(30)
+    clock.tick(60)
