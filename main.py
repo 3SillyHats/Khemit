@@ -33,7 +33,7 @@ vbo = OpenGL.arrays.vbo.VBO(
     ],'f')
 )
 
-TURN_SPEED = 1.5
+TURN_SPEED = 0.1
 MOVE_SPEED = 0.1
 camera = camera.Camera(50,0,2, 0,0,0)
 
