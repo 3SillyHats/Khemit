@@ -10,11 +10,10 @@ def checkCollision(tri, position, radius):
 		#spheres do not intersect
 		return None
 
-
 	#test if planes intersect
 	plane_distance = abs( (tri.centre-position).dot(tri.norm) )
 
-	if plane_distance  >= radius :
+	if plane_distance  > radius :
 		#plane does not intersect
 		return None
 
@@ -27,7 +26,8 @@ def checkCollision(tri, position, radius):
 	i_len = numpy.linalg.norm(i_vec)
 
 	if i_len == 0:
-		displacement = numpy.array([0,0])
+		v = -plane_distance*tri.norm
+		v_norm = numpy.linalg.norm(v)
 	else:
 		i     = i_vec / i_len
 		j     = numpy.cross(i,tri.norm)
@@ -40,11 +40,15 @@ def checkCollision(tri, position, radius):
 
 		displacement = checkCollision2d(proj,proj_radius2)
 
-	if displacement is None:
-		return None
+		if displacement is None:
+			return None
 
-	v = -plane_distance*tri.norm + displacement.dot(numpy.array([i,j]))
-	v_norm = numpy.linalg.norm(v)
+		v = -plane_distance*tri.norm + displacement.dot(numpy.array([i,j]))
+		v_norm = numpy.linalg.norm(v)
+
+	if v_norm == 0:
+		return tri.norm*(radius/2)
+
 	p = ((v_norm - radius)/v_norm) * v
 
 	return p
@@ -52,17 +56,14 @@ def checkCollision(tri, position, radius):
 def checkCollision2d(tri,r2):
 	#test if origin is inside triangle
 
-	#s2A = s*(2*Area)
-	#t2A = t*(2*Area)
-	s2A = (tri[0][1]*tri[2][0] - tri[0][0]*tri[2][1]);
-	t2A = (tri[0][0]*tri[1][1] - tri[0][1]*tri[1][0]);
+	#A *[t,s] = v   => [t,s] = A^-1 v
 
-	if s2A > 0 and t2A > 0:
-		#A2 = 2*Area
-		A2 = abs(-tri[1][1]*tri[2][0] + tri[0][1]*(-tri[1][0] + tri[2][0]) + tri[0][0]*(tri[1][1] - tri[2][1]) + tri[1][0]*tri[2][1])
-		if s2A+t2A < A2:
-			#origin must be within triangle
-			return numpy.array([0,0])
+	A = numpy.array([[tri[1][0]-tri[0][0],tri[2][0]-tri[0][0]],[tri[1][1]-tri[0][1],tri[2][1]-tri[0][1]]])
+	v = numpy.array([-tri[0][0],-tri[0][1]])
+	st = numpy.linalg.inv(A).dot(v)
+	if 0 <= st[0] <= 1  and 0 <= st[1]  <= 1 and st[0] + st[1] <= 1:
+		#origin must be within triangle
+		return numpy.array([0,0])
 
 	for start in xrange(3):
 		end = (start + 1)%3
