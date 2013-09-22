@@ -1,13 +1,13 @@
-#version 120
+#version 330
 
-//varying vec3 N;
-//varying vec3 v;
+smooth in vec4 interp_color;
+smooth in vec2 texture_coordinate;
 
-void main(void)
+uniform sampler2D tex;
+
+out vec4 outputColor;
+
+void main()
 {
-   //vec3 L = normalize(gl_LightSource[0].position.xyz - v);   
-   //vec4 Idiff = gl_FrontLightProduct[0].diffuse * max(dot(N,L), 0.0);
-   //Idiff = clamp(Idiff, 0.0, 1.0); 
-
-   gl_FragColor = vec4(1, 1, 1, 1); // Idiff;
+   outputColor = interp_color * texture(tex, texture_coordinate);
 }

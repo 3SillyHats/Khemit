@@ -1,15 +1,21 @@
 import math
 import numpy
 import pygame
+import camera
 from pygame.locals import *
 
-from render import Model, FragmentShader, VertexShader, Program
-from transformations import projection_matrix, translation_matrix, rotation_matrix, identity_matrix
+from model import Model
+from render import FragmentShader, VertexShader, Program
+import physics
+
+from transformations import clip_matrix, translation_matrix, rotation_matrix, identity_matrix
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
 pygame.init()
 screen = pygame.display.set_mode((800, 600), HWSURFACE | OPENGL | DOUBLEBUF)
+pygame.event.set_grab(True)
+pygame.mouse.set_visible(False)
 
 model = Model("models/pyramid.dae")
 vert = VertexShader("basic.vert")
@@ -30,6 +36,25 @@ vbo = OpenGL.arrays.vbo.VBO(
     ],'f')
 )
 
+TURN_SPEED = 0.01
+MOVE_SPEED = 0.1
+camera = camera.Camera(0,-10,2, 0,0,0)
+
+shader.use()
+li_loc = glGetUniformLocation(shader.program, "light_intensity")
+glUniform4f(li_loc, 0.8, 0.8, 0.8, 1.0)
+ai_loc = glGetUniformLocation(shader.program, "ambient_intensity")
+glUniform4f(ai_loc, 0.2, 0.2, 0.2, 1.0)
+
+light_direction = numpy.array([math.sqrt(1.0/6.0), -math.sqrt(2.0/6.0), math.sqrt(3.0/6.0), 0], 'f')
+
+for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            exit()
+delta_x, delta_y = pygame.mouse.get_rel()
+
 clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
@@ -37,56 +62,72 @@ while True:
             exit()
         if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
             exit()
+
+    delta_x, delta_y = pygame.mouse.get_rel()
+
+    camera.rotate(delta_x*TURN_SPEED, delta_y*TURN_SPEED)
+
+    keyDown = pygame.key.get_pressed()
+    norm = camera.getNorm()
+
+    dx, dy = 0,0
+
+    if keyDown[pygame.K_w]:
+        dx += MOVE_SPEED * norm[0];
+        dy += MOVE_SPEED * norm[1];
+    if keyDown[pygame.K_s]:
+        dx -= MOVE_SPEED * norm[0];
+        dy -= MOVE_SPEED * norm[1];
+    if keyDown[pygame.K_a]:
+        dx += MOVE_SPEED * norm[1];
+        dy -= MOVE_SPEED * norm[0];
+    if keyDown[pygame.K_d]:
+        dx -= MOVE_SPEED * norm[1];
+        dy += MOVE_SPEED * norm[0];
+
+    camera.move(dx,dy)
     
     glClearColor(0, 0, 0, 1)
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
     glEnable(GL_CULL_FACE)
-    glCullFace(GL_BACK)
-    glDisable(GL_DEPTH_TEST)
+    glCullFace(GL_FRONT) #?!
+    glEnable(GL_DEPTH_TEST)
 
     shader.use()
 
-    #fov = 90
-    #point = [0, 0, 0]
-    #normal = [0, 0, 1]
-    #perspective_point = [0, 0, -1/math.tan(fov/2)]
-    #proj_matrix = projection_matrix(point, normal, perspective=perspective_point)
-    #proj_matrix = identity_matrix() #.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-    #proj_matrix.astype(numpy.float32)
-    #proj_matrix_p = proj_matrix.ctypes.data_as(c_float_p)
-    #for i in proj_matrix_p:
-        #print(i)
-    #proj_loc = glGetUniformLocation(shader.id, "projection_matrix")
-    #glUniformMatrix4fv(proj_loc, 1, False, proj_matrix_p)
+    fov = 90.0
+    aspect = 800.0/600.0
+    near = 4.0
+    far = 10000.0
+    right = math.tan(fov*math.pi/720.0)
+    left = -right
+    top = right / aspect
+    bottom = -top
+    proj_matrix = clip_matrix(left, right, bottom, top, near, far, perspective=True)
+    proj_loc = glGetUniformLocation(shader.program, "projection_matrix")
+    glUniformMatrix4fv(proj_loc, 1, False, numpy.array(proj_matrix, 'f'))
 
-    #mv_matrix = translation_matrix([0, 0, -5000])
-    #mv_matrix *= rotation_matrix(-80, [1, 0, 0])
-    #mv_matrix = identity_matrix() #.ctypes.data_as(ctypes.POINTER(ctypes.c_float))
-    #mv_matrix.astype(numpy.float32)
-    #mv_matrix_p = proj_matrix.ctypes.data_as(c_float_p)
-    #mv_loc = glGetUniformLocation(shader.id, "modelview_matrix")
-    #glUniformMatrix4fv(mv_loc, 1, False, mv_matrix_p)
+    mv_matrix = camera.getMatrix()
+    mv_loc = glGetUniformLocation(shader.program, "modelview_matrix")
+    glUniformMatrix4fv(mv_loc, 1, True, numpy.array(mv_matrix, 'f'))
 
     #glEnable(GL_LIGHTING)
     #glEnable(GL_LIGHT0)
-    #light_pos = numpy.array([0, 1000, 0]).ctypes.data_as(POINTER(c_float))
-    #glLightfv(GL_LIGHT0, GL_POSITION, light_pos)
-    #light_diffuse = numpy.array([1, 1, 1, 1.0]).ctypes.data_as(POINTER(c_float))
-    #glMaterialfv(GL_FRONT, GL_DIFFUSE, light_diffuse);
+    #glLightfv(GL_LIGHT0, GL_POSITION, [0,100, 100])
+    #glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1.0]);
 
+    (dx, dy, dz) = physics.collide(camera.pos, 0.5, model.collideables())
+    delta = numpy.array([dx, dy, dz, 0], 'f')
+    delta_camera_space = mv_matrix.dot(delta)
+    camera.move(delta[0], delta[1], delta[2])
 
-
-    glMatrixMode(GL_PROJECTION)
-    glLoadIdentity()
-    gluPerspective(65, 800/600, 1, 10000)
-    glMatrixMode(GL_MODELVIEW)
-    glLoadIdentity()
-    glTranslatef(0, 0, -100)
-    glRotatef(-80, 1, 0, 0)
+    light_dir_camera_space = mv_matrix.dot(light_direction)
+    ld_loc = glGetUniformLocation(shader.program, "dir_to_light")
+    glUniform3fv(ld_loc, 1, numpy.array(light_dir_camera_space[:3]))
 
     for renderable in model.renderables():
-        renderable.draw()
+        renderable.draw(shader)
     
     pygame.display.flip()
     
-    clock.tick(30)
+    clock.tick(60)
