@@ -37,6 +37,12 @@ TURN_SPEED = 1.5
 MOVE_SPEED = 0.1
 camera = Camera(50,0,2, 0,0,0)
 
+shader.use()
+li_loc = glGetUniformLocation(shader.program, "light_intensity")
+glUniform4f(li_loc, 1.0, 1.0, 1.0, 1.0)
+
+light_direction = numpy.array([1, 0, 0, 0], 'f')
+
 clock = pygame.time.Clock()
 while True:
     for event in pygame.event.get():
@@ -95,6 +101,10 @@ while True:
     #glEnable(GL_LIGHT0)
     #glLightfv(GL_LIGHT0, GL_POSITION, [0,100, 100])
     #glMaterialfv(GL_FRONT, GL_DIFFUSE, [1, 0, 1, 1.0]);
+
+    light_dir_camera_space = mv_matrix.dot(light_direction)
+    ld_loc = glGetUniformLocation(shader.program, "dir_to_light")
+    glUniform3fv(ld_loc, 1, numpy.array(light_dir_camera_space[:3]))
 
     for renderable in model.renderables():
         renderable.draw()

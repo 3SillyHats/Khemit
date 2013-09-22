@@ -55,25 +55,33 @@ class Material(object):
         self.texture = texture
 
 class Mesh(object):
-    def __init__(self, indices, vertices):
-        numVerts = len(vertices) / 3
-        self.vertices = vbo.VBO(array(vertices, 'f'))
-        self.indices = vbo.VBO(array(indices, 'i2'), target=GL_ELEMENT_ARRAY_BUFFER)
-        self.count = len(flatten(indices))
+    def __init__(self, vert_indices, vertices, norm_indices, normals):
+        vert_indices = flatten(vert_indices)
+        norm_indices = flatten(norm_indices)        
+        
+        self.count = len(vert_indices)
+
+        data = zeros((self.count,6), 'f')
+        for i in xrange(self.count):
+            vertex = vertices[vert_indices[i]]
+            normal = normals[norm_indices[i]]
+            data[i,:] = concatenate((vertex,normal))
+        
+        self.vbo = vbo.VBO(data)
     
     def draw(self):
-        self.vertices.bind()
-        self.indices.bind()
+        self.vbo.bind()
         try:
             glEnableClientState(GL_VERTEX_ARRAY)
-            glVertexPointerf( self.vertices )
-            glDrawElements(
-                GL_TRIANGLES, self.count,
-                GL_UNSIGNED_SHORT, self.indices
+            glEnableVertexAttribArray( 0 )
+            glEnableVertexAttribArray( 1 )
+            glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 8*3, self.vbo )
+            glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8*3, self.vbo+8*3 )
+            glDrawArrays(
+                GL_TRIANGLES, 0, self.count
             )
         finally:
-            self.vertices.unbind()
-            self.indices.unbind()
+            self.vbo.unbind()
 
 class ModelPart(object):
     def __init__(self, mesh, im):
@@ -105,13 +113,14 @@ class Model(object):
         
         for geometry in dae.scene.objects('geometry'):
             for triset in geometry.primitives():
-                mesh = Mesh(triset.vertex_index, triset.vertex)
-                effect = triset.material.effect
-                texture = None
-                if len(effect.params) > 0:
-                    texture = effect.params[0].image.pilimage
-                part = ModelPart(mesh, texture)
-                self.parts.append(part)
+                if triset.normal_index is not None:
+                    mesh = Mesh(triset.vertex_index, triset.vertex, triset.normal_index, triset.normal)
+                    effect = triset.material.effect
+                    texture = None
+                    if len(effect.params) > 0:
+                        texture = effect.params[0].image.pilimage
+                    part = ModelPart(mesh, texture)
+                    self.parts.append(part)
     
     def renderables(self):
         for part in self.parts:
