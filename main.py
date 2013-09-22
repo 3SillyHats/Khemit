@@ -35,13 +35,20 @@ vbo = OpenGL.arrays.vbo.VBO(
 
 TURN_SPEED = 0.02
 MOVE_SPEED = 1.0
-camera = camera.Camera(50,0,2, 0,0,0)
+camera = camera.Camera(0,-10,2, 0,0,0)
 
 shader.use()
 li_loc = glGetUniformLocation(shader.program, "light_intensity")
 glUniform4f(li_loc, 1.0, 1.0, 1.0, 1.0)
 
-light_direction = numpy.array([1, 0, 0, 0], 'f')
+light_direction = numpy.array([0, -1.0/2.0, math.sqrt(3.0/4.0), 0], 'f')
+
+for event in pygame.event.get():
+        if event.type == pygame.QUIT:
+            exit()
+        if event.type == pygame.KEYDOWN and event.key == pygame.K_ESCAPE:
+            exit()
+delta_x, delta_y = pygame.mouse.get_rel()
 
 clock = pygame.time.Clock()
 while True:
@@ -85,11 +92,11 @@ while True:
 
     shader.use()
 
-    fov = 65.0
+    fov = 90.0
     aspect = 800.0/600.0
     near = 1.0
     far = 10000.0
-    right = near * math.tan(fov*math.pi/360.0)
+    right = near * math.tan(fov*math.pi/720.0)
     left = -right
     top = right / aspect
     bottom = -top

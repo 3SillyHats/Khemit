@@ -75,8 +75,8 @@ class Mesh(object):
             glEnableClientState(GL_VERTEX_ARRAY)
             glEnableVertexAttribArray( 0 )
             glEnableVertexAttribArray( 1 )
-            glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 8*3, self.vbo )
-            glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 8*3, self.vbo+8*3 )
+            glVertexAttribPointer( 0, 3, GL_FLOAT, GL_FALSE, 4*3*2, self.vbo )
+            glVertexAttribPointer( 1, 3, GL_FLOAT, GL_FALSE, 4*3*2, self.vbo+4*3 )
             glDrawArrays(
                 GL_TRIANGLES, 0, self.count
             )
