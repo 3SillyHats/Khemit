@@ -35,7 +35,7 @@ vbo = OpenGL.arrays.vbo.VBO(
 
 TURN_SPEED = 1.5
 MOVE_SPEED = 0.1
-camera = Camera(50,0,2, 0,0,0)
+camera = camera.Camera(50,0,2, 0,0,0)
 
 shader.use()
 li_loc = glGetUniformLocation(shader.program, "light_intensity")
