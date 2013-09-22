@@ -13,10 +13,10 @@ class Camera(object):
 		y = min(max(y,-math.pi/2),math.pi/2)
 		x = x%(2*math.pi)
 		self.rot = array([x,y,z])
-		self.norm = [math.cos(x), math.sin(x)]
+		self.norm = [-math.sin(x), math.cos(x)]
 
 	def move(self,x,y,z=0):
-		self.pos += array([x,y,z])
+		self.pos = self.pos + array([x,y,z])
 
 	def rotate(self,x,y,z=0):
 		self.setRot(x+self.rot[0], y+self.rot[1], z+self.rot[2])

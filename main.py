@@ -34,7 +34,7 @@ vbo = OpenGL.arrays.vbo.VBO(
 )
 
 TURN_SPEED = 0.02
-MOVE_SPEED = 0.1
+MOVE_SPEED = 1.0
 camera = camera.Camera(50,0,2, 0,0,0)
 
 shader.use()
@@ -58,7 +58,7 @@ while True:
     keyDown = pygame.key.get_pressed()
     norm = camera.getNorm()
 
-    print norm
+    #print norm
 
     dx, dy = 0,0
 
