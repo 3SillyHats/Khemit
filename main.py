@@ -118,7 +118,7 @@ while True:
     glUniform3fv(ld_loc, 1, numpy.array(light_dir_camera_space[:3]))
 
     for renderable in model.renderables():
-        renderable.draw()
+        renderable.draw(shader)
     
     pygame.display.flip()
     
