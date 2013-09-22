@@ -25,4 +25,4 @@ class Camera(object):
 		return self.norm
 
 	def getMatrix(self):
-		return rotation_matrix(90 + rot[1], [1.0, 0.0, 0.0]).dot(rotation_matrix(-rot[0], [0.0, 0.0, 1.0]).dot(translation_matrix(-pos)))
+		return rotation_matrix(90 + self.rot[1], [1.0, 0.0, 0.0]).dot(rotation_matrix(-self.rot[0], [0.0, 0.0, 1.0]).dot(translation_matrix(-self.pos)))
