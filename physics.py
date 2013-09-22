@@ -24,29 +24,29 @@ class Triangle(object):
 
         centre_spacing  = self.centre - position
         centre_distance2 = centre_spacing.dot(centre_spacing)
-	if(centre_distance2 > (radius + self.radius) ** 2):
+        if(centre_distance2 > (radius + self.radius) ** 2):
             #spheres do not intersect
             return None
 
-	#test if planes intersect
-	plane_distance = abs( (self.centre-position).dot(self.norm) )
+    	#test if planes intersect
+    	plane_distance = abs( (self.vertices[0]-position).dot(self.norm) )
 
-	if plane_distance  > radius :
+        if plane_distance  > radius :
             #plane does not intersect
             return None
 
 
 
-	proj = empty([3,2])
+    	proj = empty([3,2])
 
-	v     = (position - self.vertices[0])
-	i_vec = v - self.norm * v.dot(self.norm)
-	i_len = linalg.norm(i_vec)
+    	v     = (position - self.vertices[0])
+    	i_vec = v - self.norm * v.dot(self.norm)
+    	i_len = linalg.norm(i_vec)
 
-	if i_len == 0:
+    	if i_len == 0:
             v = -plane_distance*self.norm
             v_norm = linalg.norm(v)
-	else:
+    	else:
             i     = i_vec / i_len
             j     = cross(i,self.norm)
 
@@ -69,9 +69,10 @@ class Triangle(object):
 
         p = ((v_norm - radius)/v_norm) * v
 
-	return p
+    	return p
 
     def checkCollision2d(self,tri,r2):
+        print tri
         #test if origin is inside triangle
         
         #A *[t,s] = v   => [t,s] = A^-1 v
@@ -98,17 +99,18 @@ class Triangle(object):
                 if tri[start].dot(tri[start]) <= r2:
                     return tri[start]
                     
-            if ratio >= 1:
+            elif ratio >= 1:
                 #end point is closest to centre
                 if tri[end].dot(tri[end]) <= r2:
                     return tri[end]
 
-            if closest_dist**2 < r2:
+            elif closest_dist**2 < r2:
+                print ratio
                 #edge intersects circle
                 return closest_dist*edge_norm
 
-	#No intersection
-	return None
+    	#No intersection
+    	return None
 
 def collide(x, r, triangles):
     dx = array([0,0,0],'f')
