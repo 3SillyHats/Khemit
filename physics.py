@@ -58,6 +58,7 @@ class Triangle(object):
             v_norm = linalg.norm(v)
 
         if v_norm == 0:
+            print(self.norm)
             return self.norm*(radius/2)
 
         p = ((v_norm - radius)/v_norm) * v
@@ -71,10 +72,12 @@ class Triangle(object):
     
         A = array([[tri[1][0]-tri[0][0],tri[2][0]-tri[0][0]],[tri[1][1]-tri[0][1],tri[2][1]-tri[0][1]]])
         v = array([-tri[0][0],-tri[0][1]])
-        st = linalg.inv(A).dot(v)
-        if 0 <= st[0] <= 1  and 0 <= st[1]  <= 1 and st[0] + st[1] <= 1:
-            #origin must be within triangle
-            return array([0,0])
+
+        if linalg.det(A) != 0:
+            st = linalg.inv(A).dot(v)
+            if 0 <= st[0] <= 1  and 0 <= st[1]  <= 1 and st[0] + st[1] <= 1:
+                #origin must be within triangle
+                return array([0,0])
         
         for start in xrange(3):
             end = (start + 1)%3

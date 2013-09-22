@@ -12,8 +12,10 @@ from transformations import clip_matrix, translation_matrix, rotation_matrix, id
 from OpenGL.GL import *
 from OpenGL.GLU import *
 
+SCREEN_SIZE = (1920,1080)
+
 pygame.init()
-screen = pygame.display.set_mode((800, 600), HWSURFACE | OPENGL | DOUBLEBUF)
+screen = pygame.display.set_mode(SCREEN_SIZE, HWSURFACE | OPENGL | DOUBLEBUF | FULLSCREEN)
 pygame.event.set_grab(True)
 pygame.mouse.set_visible(False)
 
@@ -99,8 +101,8 @@ while True:
 
     shader.use()
 
-    fov = 90.0
-    aspect = 800.0/600.0
+    fov = 70.0
+    aspect = SCREEN_SIZE[0]*1.0/SCREEN_SIZE[1]
     near = 4.0
     far = 10000.0
     right = math.tan(fov*math.pi/720.0)
@@ -123,9 +125,9 @@ while True:
     vz -= 9.8*dt
     camera.move(0, 0, vz*dt)
 
-    (dx, dy, dz) = physics.collide(camera.pos, 1.0, model.collideables())
-    if dz > 0:
-            vz = 0
+    (dx, dy, dz) = physics.collide(camera.pos, 0.4, model.collideables())
+    if (dz > 0):
+        vz = 0
     camera.move(dx, dy, dz)
 
     light_dir_camera_space = mv_matrix.dot(light_direction)

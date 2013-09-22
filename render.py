@@ -1,6 +1,5 @@
 from numpy import *
 
-from collada import Collada
 from OpenGL.GL import *
 from OpenGL.GL import shaders
 from OpenGL.arrays import vbo
@@ -45,8 +44,8 @@ class Material(object):
     
     def bind(self, shader):
         glEnable(GL_TEXTURE_2D)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST)
-        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+        glTexParameterf(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
         glActiveTexture( GL_TEXTURE0 + 1 )
         glBindTexture(GL_TEXTURE_2D, self.texID)
         tex_loc = glGetUniformLocation(shader.program, "tex")
@@ -95,22 +94,3 @@ class ModelPart(object):
         self.material.bind(shader)
         self.mesh.draw()
 
-class Model(object):
-    def __init__(self, filename):
-        dae = Collada(filename)
-        self.parts = []
-        
-        for geometry in dae.scene.objects('geometry'):
-            for triset in geometry.primitives():
-                if triset.normal_index is not None:
-                    mesh = Mesh(triset.vertex_index, triset.vertex, triset.texcoord_indexset[0], triset.texcoordset[0], triset.normal_index, triset.normal)
-                    effect = triset.material.effect
-                    texture = None
-                    if len(effect.params) > 0:
-                        texture = effect.params[0].image.pilimage
-                    part = ModelPart(mesh, texture)
-                    self.parts.append(part)
-    
-    def renderables(self):
-        for part in self.parts:
-            yield part

@@ -27,7 +27,8 @@ class Model(object):
 
                         for triangle in triset.vertex_index:
                             tri = physics.Triangle(triset.vertex[triangle])
-                            self.triangles.append(tri)
+                            if tri.norm.dot(tri.norm) != 0:
+                                self.triangles.append(tri)
     
     def renderables(self):
         for part in self.parts:
