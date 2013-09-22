@@ -39,9 +39,11 @@ camera = camera.Camera(0,-10,2, 0,0,0)
 
 shader.use()
 li_loc = glGetUniformLocation(shader.program, "light_intensity")
-glUniform4f(li_loc, 1.0, 1.0, 1.0, 1.0)
+glUniform4f(li_loc, 0.8, 0.8, 0.8, 1.0)
+ai_loc = glGetUniformLocation(shader.program, "ambient_intensity")
+glUniform4f(ai_loc, 0.2, 0.2, 0.2, 1.0)
 
-light_direction = numpy.array([0, -1.0/2.0, math.sqrt(3.0/4.0), 0], 'f')
+light_direction = numpy.array([math.sqrt(1.0/6.0), -math.sqrt(2.0/6.0), math.sqrt(3.0/6.0), 0], 'f')
 
 for event in pygame.event.get():
         if event.type == pygame.QUIT:
@@ -64,8 +66,6 @@ while True:
 
     keyDown = pygame.key.get_pressed()
     norm = camera.getNorm()
-
-    #print norm
 
     dx, dy = 0,0
 
