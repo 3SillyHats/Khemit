@@ -58,6 +58,8 @@ while True:
     keyDown = pygame.key.get_pressed()
     norm = camera.getNorm()
 
+    dx, dy = 0,0
+
     if keyDown[pygame.K_w]:
         dx += MOVE_SPEED * norm[0];
         dy += MOVE_SPEED * norm[1];
